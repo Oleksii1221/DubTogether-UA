@@ -9,7 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "src" / "dubua" / "assets"
-REQUIRED = ["manifest.json", "uk.gdc", "Nunito.ttf", "screenshots/steam-library-clean.png"]
+REQUIRED = ["manifest.json", "uk.gdc", "Nunito.ttf", "app.png", "app.ico",
+            "screenshots/steam-library-clean.png"]
 
 
 def main() -> None:
@@ -27,6 +28,7 @@ def main() -> None:
     subprocess.run([
         sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--windowed",
         "--name", "DubTogether-UA-Installer",
+        "--icon", str(ASSETS / "app.ico"),
         "--paths", str(ROOT / "src"),
         "--add-data", f"{ASSETS};dubua/assets",
         "--distpath", str(ROOT / "dist"),

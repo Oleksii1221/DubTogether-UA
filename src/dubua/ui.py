@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QRectF, Qt, QThread, QTimer, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import (
     QApplication, QDialog, QFrame, QGraphicsOpacityEffect, QHBoxLayout,
@@ -169,6 +169,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Dub Together UA — український переклад")
+        self.setWindowIcon(QIcon(str(ASSETS / "app.ico")))
         self.setFixedSize(970, 740)
         self.setStyleSheet(STYLESHEET)
         self.pack: Path | None = None
@@ -182,6 +183,10 @@ class MainWindow(QMainWindow):
         root.setSpacing(17)
 
         header = QHBoxLayout()
+        logo = QLabel()
+        logo.setPixmap(QPixmap(str(ASSETS / "app.png")).scaled(38, 38, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        logo.setAccessibleName("Логотип Dub Together UA")
+        header.addWidget(logo)
         header.addWidget(label("DUB  TOGETHER  /  UA", "brand", False))
         header.addStretch()
         flag = Flag()
@@ -302,7 +307,7 @@ class MainWindow(QMainWindow):
         body.addWidget(visual, 1)
         nav = QHBoxLayout()
         self.prev_step = button("< Назад", "secondary", lambda: self._set_guide_step(0))
-        self.next_step = button("Далі >", "primary", lambda: self._set_guide_step(1))
+        self.next_step = button("Далі >", "primary", self._guide_next)
         nav.addWidget(self.prev_step)
         nav.addWidget(self.next_step)
         nav.addStretch()
@@ -386,7 +391,13 @@ class MainWindow(QMainWindow):
         else:
             self.guide_image.setText("Зображення інструкції недоступне")
         self.prev_step.setEnabled(number > 0)
-        self.next_step.setEnabled(number < 1)
+        self.next_step.setText("Готово" if number == 1 else "Далі >")
+
+    def _guide_next(self):
+        if self.guide_step == 0:
+            self._set_guide_step(1)
+        else:
+            self.close()
 
     def _copy_option(self):
         QApplication.clipboard().setText(self.option.text())
@@ -405,6 +416,7 @@ class MainWindow(QMainWindow):
 def run_app(screenshot: Path | None = None, guide: bool = False) -> int:
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     app = QApplication(sys.argv[:1])
+    app.setWindowIcon(QIcon(str(ASSETS / "app.ico")))
     font_id = QFontDatabase.addApplicationFont(str(ASSETS / "Nunito.ttf"))
     if font_id >= 0:
         app.setFont(QFont("Nunito", 10))
