@@ -10,11 +10,12 @@ from PySide6.QtCore import QEasingCurve, QEventLoop, QPropertyAnimation, QRectF,
 from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QDialog, QFrame, QGraphicsOpacityEffect, QHBoxLayout,
-    QLabel, QLineEdit, QMainWindow, QProgressBar, QPushButton, QStackedWidget,
+    QLabel, QMainWindow, QProgressBar, QPushButton, QSizePolicy, QStackedWidget,
     QTextEdit, QVBoxLayout, QWidget,
 )
 
 from . import __author__, __version__
+from .font_rendering import GrayscaleTextStyle
 from .game import running_games
 from .installer import ASSETS, install, launch_option, output_path
 
@@ -22,13 +23,13 @@ GITHUB = "https://github.com/Oleksii1221/DubTogether-UA"
 SITE_ASSETS = ASSETS / "screenshots"
 
 STYLESHEET = """
-QWidget { background: #0e1328; color: #f9f6ff; font-family: 'Rubik', 'Segoe UI'; font-size: 15px; }
+QWidget { background: #0e1328; color: #f9f6ff; font-family: 'Nunito', 'Segoe UI'; font-size: 15px; }
 QFrame#card { background: #18142f; border: 2px solid #080b1b; border-radius: 25px; }
 QFrame#inner { background: #241e3c; border: 1px solid #51416b; border-radius: 17px; }
 QLabel#brand { font-family: 'Lilita One'; font-size: 25px; font-weight: 400; color: #fff9ed; }
-QLabel#heading { font-size: 43px; font-weight: 900; color: #fffaf0; }
-QLabel#pageTitle { font-size: 30px; font-weight: 900; color: #fffaf0; }
-QLabel#subhead { font-size: 19px; font-weight: 800; color: #fffaf0; }
+QLabel#heading { font-family: 'Rubik'; font-size: 43px; font-weight: 900; color: #fffaf0; }
+QLabel#pageTitle { font-family: 'Rubik'; font-size: 30px; font-weight: 900; color: #fffaf0; }
+QLabel#subhead { font-family: 'Rubik'; font-size: 19px; font-weight: 800; color: #fffaf0; }
 QLabel#kicker { color: #23c8ac; font-size: 13px; font-weight: 900; letter-spacing: 1px; }
 QLabel#muted { color: #b8afd0; }
 QLabel#step { color: #9187b0; font-weight: 800; font-size: 12px; }
@@ -45,7 +46,7 @@ QPushButton#danger:hover { background: #ff9288; }
 QPushButton#link { border: none; color: #c4b6e1; background: transparent; text-decoration: underline; padding: 3px; }
 QPushButton#link:hover { color: #fff1a0; }
 QPushButton:disabled { background: #554b68; color: #aca5b7; }
-QLineEdit { background: #0d1022; color: #f9f7ff; border: 1px solid #5e5277; border-radius: 11px; padding: 10px 12px; selection-background-color: #20b9a5; }
+QLabel#launchOption { background: #0d1022; color: #f9f7ff; border: 1px solid #5e5277; border-radius: 11px; padding: 10px 12px; min-height: 23px; }
 QTextEdit { background: #111328; color: #bcb5d3; border: 1px solid #453a62; border-radius: 12px; padding: 10px; }
 QProgressBar { background: #0b0d1d; border: 2px solid #4b3e65; border-radius: 10px; text-align: center; min-height: 16px; color: #fff; font-weight: 800; }
 QProgressBar::chunk { background: #20bba7; border-radius: 8px; }
@@ -281,14 +282,14 @@ class MainWindow(QMainWindow):
         body.addWidget(label("Пак готовий. Залишився один рядок.", "pageTitle"))
         body.addWidget(label("Скопіюй весь параметр і встав його в Steam > Dub Together > Властивості > Загальні > Параметри запуску.", "muted"))
         option_row = QHBoxLayout()
-        self.option = QLineEdit()
-        self.option.setReadOnly(True)
+        self.option = label("", "launchOption", False)
+        self.option.setAccessibleName("Параметр запуску Steam")
+        self.option.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         option_row.addWidget(self.option, 1)
         option_row.addWidget(button("Копіювати", "primary", self._copy_option))
         body.addLayout(option_row)
         path_row = QHBoxLayout()
         self.path_label = label("", "muted")
-        self.path_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         path_row.addWidget(self.path_label, 1)
         path_row.addWidget(button("Копіювати шлях", "secondary", self._copy_path))
         body.addLayout(path_row)
@@ -370,7 +371,9 @@ class MainWindow(QMainWindow):
         if self.pack is None:
             return
         self.option.setText(launch_option(self.pack))
+        self.option.setToolTip(self.option.text())
         self.path_label.setText("Пак: " + str(self.pack))
+        self.path_label.setToolTip(str(self.pack))
         self._set_guide_step(0)
         self._set_page(2)
 
@@ -415,11 +418,14 @@ class MainWindow(QMainWindow):
 def run_app(screenshot: Path | None = None, guide: bool = False) -> int:
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     app = QApplication(sys.argv[:1])
+    grayscale_style = GrayscaleTextStyle()
+    app.setStyle(grayscale_style)
     app.setWindowIcon(QIcon(str(ASSETS / "app.png")))
-    font_id = QFontDatabase.addApplicationFont(str(ASSETS / "Rubik.ttf"))
+    font_id = QFontDatabase.addApplicationFont(str(ASSETS / "Nunito.ttf"))
+    QFontDatabase.addApplicationFont(str(ASSETS / "Rubik.ttf"))
     QFontDatabase.addApplicationFont(str(ASSETS / "LilitaOne.ttf"))
     if font_id >= 0:
-        font = QFont("Rubik", 10)
+        font = QFont("Nunito", 10)
         font.setStyleStrategy(QFont.StyleStrategy.NoSubpixelAntialias)
         app.setFont(font)
     window = MainWindow()
