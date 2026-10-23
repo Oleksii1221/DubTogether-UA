@@ -24,6 +24,10 @@ jobs:
           PYTHONPATH: src
           QT_QPA_PLATFORM: offscreen
       - run: python tools/build_windows.py
+      - name: Smoke test packaged interface
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -c "import pathlib, subprocess; shot=pathlib.Path('dist/installer-smoke.png'); subprocess.run(['dist/DubTogether-UA-Installer.exe', '--screenshot', str(shot)], check=True, timeout=30); assert shot.is_file()"
       - uses: actions/upload-artifact@v4
         with:
           name: DubTogether-UA-Windows-dev
