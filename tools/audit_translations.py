@@ -12,7 +12,7 @@ PLACEHOLDERS = re.compile(r"%(?:\d+\$)?[-+#0-9.]*[sdf]")
 KNOWN_UNTRANSLATED_PROPER_NAMES = {"TWITCH", "DISCORD"}
 REQUIRED_UI = {
     "NORMAL", "CHIPMUNK", "MONSTER", "AUTOTUNE", "LINE %d/%d",
-    "▶ ORIGINAL", "▶ MEIN TAKE", "■ STOPP", "ABGEBEN", "WEITER ▶",
+    "▶ ORIGINAL", "▶ MEIN TAKE", "■ STOPP", "ABGEBEN", "WEITER ▶", "START ▶",
 }
 
 
