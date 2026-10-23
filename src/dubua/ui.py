@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import QEasingCurve, QEventLoop, QPropertyAnimation, QRectF, Qt, QThread, QTimer, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QLinearGradient, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QDialog, QFrame, QGraphicsOpacityEffect, QHBoxLayout,
     QLabel, QMainWindow, QProgressBar, QPushButton, QSizePolicy, QStackedWidget,
@@ -87,7 +87,7 @@ class Flag(QWidget):
 
 
 class Waveform(QWidget):
-    """Original, subtle voice-wave art inspired by the game's palette."""
+    """Animated voice-wave and microphone art shared with the website."""
 
     def __init__(self):
         super().__init__()
@@ -105,11 +105,13 @@ class Waveform(QWidget):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         w, h = self.width(), self.height()
+        diameter = min(w * .88, h * .86)
+        inner = diameter * .67
         p.setPen(Qt.NoPen)
         p.setBrush(QColor("#30264f"))
-        p.drawEllipse(QRectF(w * .13, h * .06, w * .75, h * .87))
+        p.drawEllipse(QRectF((w - diameter) / 2, (h - diameter) / 2, diameter, diameter))
         p.setBrush(QColor("#463468"))
-        p.drawEllipse(QRectF(w * .24, h * .18, w * .52, h * .64))
+        p.drawEllipse(QRectF((w - inner) / 2, (h - inner) / 2, inner, inner))
         for color, scale, phase in (("#6f61aa", 1.0, 0), ("#20bca8", .70, 1.0)):
             path = QPainterPath()
             for x in range(0, w + 2, 2):
@@ -122,11 +124,40 @@ class Waveform(QWidget):
                     path.lineTo(x, y)
             p.setPen(QPen(QColor(color), 5 if scale == .70 else 3, Qt.SolidLine, Qt.RoundCap))
             p.drawPath(path)
+
+        # Match the CSS microphone on the website, including its slight sway.
+        mic_scale = diameter / 360
+        p.save()
+        p.translate(w * .52, h * .5)
+        p.rotate(-9 + math.sin(self.phase * .55) * 2)
+        p.scale(mic_scale, mic_scale)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor("#0b0d1d"))
+        p.drawRoundedRect(QRectF(-42, -85, 100, 127), 50, 50)
+        p.drawRoundedRect(QRectF(1, 28, 14, 62), 7, 7)
+        p.drawRoundedRect(QRectF(-37, 86, 90, 14), 7, 7)
+
+        head_gradient = QLinearGradient(-50, -95, 50, 32)
+        head_gradient.setColorAt(0, QColor("#51486d"))
+        head_gradient.setColorAt(1, QColor("#28243f"))
+        p.setBrush(head_gradient)
+        p.setPen(QPen(QColor("#111322"), 7))
+        p.drawRoundedRect(QRectF(-50, -95, 100, 127), 50, 50)
+        p.setPen(QPen(QColor("#a69bc8"), 4))
+        p.drawLine(-22, -70, -22, 8)
+        p.drawLine(22, -70, 22, 8)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor("#1a1b2e"))
+        p.drawRoundedRect(QRectF(-7, 20, 14, 64), 7, 7)
+        p.setBrush(QColor("#17192b"))
+        p.drawRoundedRect(QRectF(-45, 78, 90, 14), 7, 7)
+        p.restore()
+
         p.setPen(Qt.NoPen)
         p.setBrush(QColor("#ffce41"))
-        p.drawEllipse(QRectF(w * .47, h * .43, 24, 24))
+        p.drawEllipse(QRectF(w * .13, h * .29, 24, 24))
         p.setBrush(QColor("#fff8d9"))
-        p.drawEllipse(QRectF(w * .47 + 7, h * .43 + 7, 10, 10))
+        p.drawEllipse(QRectF(w * .13 + 7, h * .29 + 7, 10, 10))
 
 
 class InstallThread(QThread):
