@@ -5,6 +5,9 @@
   [умови Qt for Python](https://doc.qt.io/qtforpython-6/).
 - **Nunito** — SIL Open Font License 1.1; текст у
   [`licenses/OFL-Nunito.txt`](licenses/OFL-Nunito.txt).
+- **Rubik** і **Lilita One** — шрифти Google Fonts під SIL Open Font License 1.1;
+  тексти ліцензій входять до інсталятора й сайту у файлах
+  `OFL-Rubik.txt` та `OFL-LilitaOne.txt` поруч зі шрифтами.
 - **PyInstaller**, **bsdiff4**, **psutil** — мають власні ліцензії у їхніх
   дистрибутивах Python. Вони не змінюють ліцензію авторського коду проєкту.
 - **GDRETools** використовується лише розробником для відтворення файлів патча

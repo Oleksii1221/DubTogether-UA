@@ -22,10 +22,10 @@ GITHUB = "https://github.com/Oleksii1221/DubTogether-UA"
 SITE_ASSETS = ASSETS / "screenshots"
 
 STYLESHEET = """
-QWidget { background: #0e1328; color: #f9f6ff; font-family: 'Nunito', 'Segoe UI'; font-size: 15px; }
+QWidget { background: #0e1328; color: #f9f6ff; font-family: 'Rubik', 'Segoe UI'; font-size: 15px; }
 QFrame#card { background: #18142f; border: 2px solid #080b1b; border-radius: 25px; }
 QFrame#inner { background: #241e3c; border: 1px solid #51416b; border-radius: 17px; }
-QLabel#brand { font-size: 22px; font-weight: 900; color: #fff9ed; }
+QLabel#brand { font-family: 'Lilita One'; font-size: 25px; font-weight: 400; color: #fff9ed; }
 QLabel#heading { font-size: 43px; font-weight: 900; color: #fffaf0; }
 QLabel#pageTitle { font-size: 30px; font-weight: 900; color: #fffaf0; }
 QLabel#subhead { font-size: 19px; font-weight: 800; color: #fffaf0; }
@@ -416,9 +416,12 @@ def run_app(screenshot: Path | None = None, guide: bool = False) -> int:
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     app = QApplication(sys.argv[:1])
     app.setWindowIcon(QIcon(str(ASSETS / "app.png")))
-    font_id = QFontDatabase.addApplicationFont(str(ASSETS / "Nunito.ttf"))
+    font_id = QFontDatabase.addApplicationFont(str(ASSETS / "Rubik.ttf"))
+    QFontDatabase.addApplicationFont(str(ASSETS / "LilitaOne.ttf"))
     if font_id >= 0:
-        app.setFont(QFont("Nunito", 10))
+        font = QFont("Rubik", 10)
+        font.setStyleStrategy(QFont.StyleStrategy.NoSubpixelAntialias)
+        app.setFont(font)
     window = MainWindow()
     if screenshot:
         if guide:

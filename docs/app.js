@@ -1,9 +1,8 @@
 (() => {
   "use strict";
   const repository = "Oleksii1221/DubTogether-UA";
-  const buttons = [document.getElementById("download"), document.getElementById("download-bottom")];
+  const button = document.getElementById("download");
   const status = document.getElementById("release-status");
-  const count = document.getElementById("download-count");
 
   fetch(`https://api.github.com/repos/${repository}/releases/latest`, {
     headers: { Accept: "application/vnd.github+json" }
@@ -12,15 +11,9 @@
     const release = await response.json();
     const asset = (release.assets || []).find((entry) => entry.name === "DubTogether-UA-Installer.exe");
     if (!asset || !asset.browser_download_url) throw new Error("No Windows asset");
-    for (const link of buttons) {
-      link.href = asset.browser_download_url;
-      link.firstChild.textContent = "Встановити для Windows ";
-    }
-    status.textContent = `${release.tag_name} · Windows · ${(asset.size / 1048576).toFixed(1)} МБ`;
-    count.textContent = `Завантажень цього файлу на GitHub: ${asset.download_count.toLocaleString("uk-UA")}`;
-  }).catch(() => {
-    count.textContent = "Статистика завантажень тимчасово недоступна.";
-  });
+    button.href = asset.browser_download_url;
+    status.textContent = `${release.tag_name} · Windows · ${(asset.size / 1048576).toFixed(1)} МБ · безкоштовно`;
+  }).catch(() => { /* The direct download link works without the API. */ });
 
   const analytics = window.DUBUA_ANALYTICS || {};
   if (analytics.scriptUrl && analytics.websiteId) {
