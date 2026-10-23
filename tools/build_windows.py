@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "src" / "dubua" / "assets"
-REQUIRED = ["manifest.json", "uk.gdc", "Rubik.ttf", "LilitaOne.ttf",
+REQUIRED = ["manifest.json", "uk.gdc", "Nunito.ttf", "Rubik.ttf", "LilitaOne.ttf",
             "OFL-Rubik.txt", "OFL-LilitaOne.txt", "app.png", "app.ico",
             "screenshots/steam-library-clean.png"]
 
