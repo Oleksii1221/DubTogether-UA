@@ -6,6 +6,7 @@
 
 Український переклад **Dub Together** для Windows і Steam.
 Один EXE, покрокове встановлення, зрозуміла інструкція для параметрів запуску.
+Автор перекладу та інсталятора: **Kico**.
 
 [Сайт](https://oleksii1221.github.io/DubTogether-UA/) ·
 [Встановити для Windows](https://github.com/Oleksii1221/DubTogether-UA/releases/latest/download/DubTogether-UA-Installer.exe) ·
@@ -15,7 +16,7 @@
 
 ![Вітальний екран інсталятора](docs/assets/app-welcome.png)
 
-> **Версія 1.0:** стабільний реліз у `master`. Подальша розробка — у `dev`.
+> **Версія 1.0.1:** стабільний реліз у `master`. Подальша розробка — у `dev`.
 
 ## Що робить інсталятор
 
