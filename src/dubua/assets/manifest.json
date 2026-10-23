@@ -1,0 +1,39 @@
+{
+  "patches": {
+    "autoload/Lang.gdc": {
+      "file": "Lang.gdc.bsdiff",
+      "original_sha256": "3166422b4c7d063106087e2a49a6f0e128e9fb22ed96f7a09ab97daeba278ba3",
+      "result_sha256": "aa5ff3370d3643dcdcd247d006682b49d475ba1015c3490a4c49df6039549add"
+    },
+    "autoload/Settings.gdc": {
+      "file": "Settings.gdc.bsdiff",
+      "original_sha256": "8025673872922f6cc0bca1bbfe620df8f3c3cf597f8984b6cfe70f18fd198f13",
+      "result_sha256": "0c449ae487760b342189646e49b2efd24db68c7d5db5758895eeb9c765946a1d"
+    },
+    "autoload/UiTheme.gdc": {
+      "file": "UiTheme.gdc.bsdiff",
+      "original_sha256": "c4ea099cbdb64903b9844aa65173ee77e0bd9c60033ce57003f6bb304e0dde03",
+      "result_sha256": "4f22940b8549269565e653c268537ddf63e01f31ff5a3ea5f74e1e3a2a5a812e"
+    },
+    "scenes/screens/SettingsScreen.gdc": {
+      "file": "SettingsScreen.gdc.bsdiff",
+      "original_sha256": "79389c5a737be6c465785f83f3058d1130edbfdd05418bf2bf3c549fd2b09c44",
+      "result_sha256": "41ba818641acf781f6f35a4d229aadac0edf10d89cfac8de90edafdb0d0ccc13"
+    },
+    "scenes/screens/RecordScreen.gdc": {
+      "file": "RecordScreen.gdc.bsdiff",
+      "original_sha256": "3b987065bb8b281a8c2730c19c94713e09b7354894d2a721b07e8d48bf8c1d2d",
+      "result_sha256": "c34725e2b3d93352a5997c84a4d5077dae55e838b35bdfcb04ab01d6ebd6c189"
+    }
+  },
+  "added": {
+    "autoload/sprachen/uk.gdc": {
+      "file": "uk.gdc",
+      "sha256": "72e67cb67ebc05d8dea805143d6b460f502fc450504b4330f4acbfdece8c3b28"
+    },
+    "autoload/sprachen/uk.gd.remap": {
+      "file": "uk.gd.remap",
+      "sha256": "f387fb726d4b19d51ffedb3a1e1936a9fe39cc705e8eb058df584a5b70f5f119"
+    }
+  }
+}

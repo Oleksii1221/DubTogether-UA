@@ -1,0 +1,28 @@
+name: Windows development build
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-build.txt
+      - run: python tools/audit_translations.py
+      - run: python -m unittest discover -s tests -v
+        env:
+          PYTHONPATH: src
+          QT_QPA_PLATFORM: offscreen
+      - run: python tools/build_windows.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DubTogether-UA-Windows-dev
+          path: dist/DubTogether-UA-Installer.exe
+          if-no-files-found: error
