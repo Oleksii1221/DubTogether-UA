@@ -109,7 +109,6 @@ h1 span { color: #fff1c8; }
   .lead { max-width: 410px; font-size: 16px; margin: 21px 0 25px; }
   .install { min-height: 52px; padding: 11px 16px; font-size: 14px; }
   .footer { font-size: 10px; }
-  .footer span:last-child { display: none; }
 }
 @media (max-width: 420px) {
   .brand img { width: 24px; height: 24px; }
