@@ -84,8 +84,9 @@ $env:PYTHONPATH = 'src'
 
 ## Сайт і статистика
 
-Сайт лежить у `docs/`. Після схвалення стабільного релізу його можна публікувати
-через **Settings → Pages → Deploy from a branch → master /docs**. Кнопка
+Сайт лежить у `docs/` і публікується через GitHub Pages з **dev /docs**.
+Після схвалення стабільного релізу джерело Pages можна перемкнути на
+**master /docs** без автоматичного пушу до `master`. Кнопка
 завантаження читає останній GitHub Release і посилається на файл
 `DubTogether-UA-Installer.exe`; кількість завантажень бере з GitHub API.
 
