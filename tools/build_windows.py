@@ -18,15 +18,17 @@ def main() -> None:
     if missing:
         raise SystemExit("Missing installer assets: " + ", ".join(missing))
     subprocess.run([sys.executable, str(ROOT / "tools" / "audit_translations.py")], check=True)
-    # Image/PDF tools in developer runtimes carry unrelated ICU and CRT DLLs.
-    # Keep those directories out of PyInstaller's dependency scan.
+    # CI and developer PATH entries may contain unrelated CRT and ICU DLLs.
+    # PyInstaller scans PATH for dependencies, so give it only Python and
+    # Windows directories. Qt DLLs are discovered from the PySide6 package.
     build_env = os.environ.copy()
-    build_env["PATH"] = os.pathsep.join(
-        part for part in build_env.get("PATH", "").split(os.pathsep)
-        if "poppler" not in part.casefold()
-        and not ("codex-primary-runtime" in part.casefold()
-                 and "dependencies\\native" in part.casefold())
-    )
+    windows = Path(os.environ.get("SystemRoot", r"C:\Windows"))
+    build_env["PATH"] = os.pathsep.join(dict.fromkeys(map(str, (
+        Path(sys.executable).parent,
+        Path(sys.base_prefix),
+        windows / "System32",
+        windows,
+    ))))
     subprocess.run([
         sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--windowed",
         "--name", "DubTogether-UA-Installer",
