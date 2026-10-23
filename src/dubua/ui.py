@@ -169,7 +169,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Dub Together UA — український переклад")
-        self.setWindowIcon(QIcon(str(ASSETS / "app.ico")))
+        self.setWindowIcon(QIcon(str(ASSETS / "app.png")))
         self.setFixedSize(970, 740)
         self.setStyleSheet(STYLESHEET)
         self.pack: Path | None = None
@@ -416,7 +416,7 @@ class MainWindow(QMainWindow):
 def run_app(screenshot: Path | None = None, guide: bool = False) -> int:
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     app = QApplication(sys.argv[:1])
-    app.setWindowIcon(QIcon(str(ASSETS / "app.ico")))
+    app.setWindowIcon(QIcon(str(ASSETS / "app.png")))
     font_id = QFontDatabase.addApplicationFont(str(ASSETS / "Nunito.ttf"))
     if font_id >= 0:
         app.setFont(QFont("Nunito", 10))
