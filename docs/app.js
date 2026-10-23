@@ -1,7 +1,6 @@
 (() => {
   "use strict";
   const repository = "Oleksii1221/DubTogether-UA";
-  const releaseUrl = `https://github.com/${repository}/releases`;
   const buttons = [document.getElementById("download"), document.getElementById("download-bottom")];
   const status = document.getElementById("release-status");
   const count = document.getElementById("download-count");
@@ -15,14 +14,12 @@
     if (!asset || !asset.browser_download_url) throw new Error("No Windows asset");
     for (const link of buttons) {
       link.href = asset.browser_download_url;
-      link.firstChild.textContent = "Завантажити для Windows ";
+      link.firstChild.textContent = "Встановити для Windows ";
     }
     status.textContent = `${release.tag_name} · Windows · ${(asset.size / 1048576).toFixed(1)} МБ`;
     count.textContent = `Завантажень цього файлу на GitHub: ${asset.download_count.toLocaleString("uk-UA")}`;
   }).catch(() => {
-    for (const link of buttons) link.href = releaseUrl;
-    status.textContent = "Перший реліз готується. Слідкуй за оновленнями на GitHub.";
-    count.textContent = "Завантаження з’явиться тут після першого релізу.";
+    count.textContent = "Статистика завантажень тимчасово недоступна.";
   });
 
   const analytics = window.DUBUA_ANALYTICS || {};

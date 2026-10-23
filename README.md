@@ -8,16 +8,14 @@
 Один EXE, покрокове встановлення, зрозуміла інструкція для параметрів запуску.
 
 [Сайт](https://oleksii1221.github.io/DubTogether-UA/) ·
-[Завантажити реліз](https://github.com/Oleksii1221/DubTogether-UA/releases) ·
+[Встановити для Windows](https://github.com/Oleksii1221/DubTogether-UA/releases/latest/download/DubTogether-UA-Installer.exe) ·
 [Повідомити про проблему](https://github.com/Oleksii1221/DubTogether-UA/issues)
 
 </div>
 
 ![Вітальний екран інсталятора](docs/assets/app-welcome.png)
 
-> **Статус:** розробка у гілці `dev`. Стабільні релізи з'являться у `master`
-> після перевірки. Поки реліз не опубліковано, сайт показує це прямо, без
-> кнопки, що веде на неіснуючий EXE.
+> **Версія 1.0:** стабільний реліз у `master`. Подальша розробка — у `dev`.
 
 ## Що робить інсталятор
 
@@ -33,7 +31,7 @@
 
 ## Встановлення для гравця
 
-1. Завантаж `DubTogether-UA-Installer.exe` на сторінці [Releases](https://github.com/Oleksii1221/DubTogether-UA/releases).
+1. [Завантаж `DubTogether-UA-Installer.exe`](https://github.com/Oleksii1221/DubTogether-UA/releases/latest/download/DubTogether-UA-Installer.exe) для Windows.
 2. Відкрий EXE, збережи свій прогрес у грі, натисни **«Почати встановлення»**.
 3. Прочитай попередження та підтвердь. Дочекайся завершення.
 4. Натисни **«Копіювати»** біля повного рядка `--main-pack "..."`.
@@ -85,10 +83,8 @@ $env:PYTHONPATH = 'src'
 
 ## Сайт і статистика
 
-Сайт лежить у `docs/` і публікується через GitHub Pages з **dev /docs**.
-Після схвалення стабільного релізу джерело Pages можна перемкнути на
-**master /docs** без автоматичного пушу до `master`. Кнопка
-завантаження читає останній GitHub Release і посилається на файл
+Сайт лежить у `docs/` і публікується через GitHub Pages. Кнопка
+веде прямо на останній GitHub Release і файл
 `DubTogether-UA-Installer.exe`; кількість завантажень бере з GitHub API.
 
 Для Umami додай публічні `scriptUrl` і `websiteId` у [`docs/config.js`](docs/config.js).
@@ -99,7 +95,7 @@ $env:PYTHONPATH = 'src'
 ## Гілки, участь і ліцензії
 
 - `dev` — розробка, Windows збірка в Actions як артефакт.
-- `master` — перевірені релізи; автоматичного пушу або релізу немає.
+- `master` — перевірені релізи; оновлюється вручну після перевірки.
 
 Пропонуй виправлення перекладу через Pull Request у `dev`, бажано зі знімком
 екрана й поясненням контексту. Ніколи не додавай до репозиторію повний PCK,
