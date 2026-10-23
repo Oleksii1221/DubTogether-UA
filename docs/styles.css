@@ -1,0 +1,135 @@
+@font-face {
+  font-family: "Rubik";
+  src: url("assets/Rubik.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lilita One";
+  src: url("assets/LilitaOne.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+:root {
+  --bg: #10152b;
+  --ink: #fff9ef;
+  --muted: #c6bdd8;
+  --teal: #25c7ae;
+  --yellow: #ffce3f;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  color: var(--ink);
+  background: radial-gradient(circle at 77% 48%, #24203f 0, #10152b 48%);
+  font-family: "Rubik", "Segoe UI", sans-serif;
+}
+a { color: inherit; text-decoration: none; }
+a:focus-visible { outline: 3px solid var(--teal); outline-offset: 5px; border-radius: 6px; }
+.wrap { width: min(1160px, calc(100% - 64px)); margin-inline: auto; }
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-block: clamp(18px, 3vh, 28px);
+}
+.brand { display: inline-flex; align-items: center; gap: 11px; white-space: nowrap; }
+.brand img { width: 38px; height: 38px; }
+.brand span { font: 400 clamp(20px, 2.2vw, 28px)/1 "Lilita One", "Rubik", sans-serif; letter-spacing: .02em; }
+.brand i { color: var(--teal); font-style: normal; }
+nav { display: flex; gap: clamp(18px, 3vw, 32px); font-size: 15px; font-weight: 700; }
+nav a { color: #d6cce9; transition: color .18s; }
+nav a:hover { color: var(--yellow); }
+.hero {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, .94fr);
+  align-items: center;
+  gap: 4%;
+}
+.copy { position: relative; z-index: 2; padding-bottom: 3vh; }
+.eyebrow { margin: 0 0 20px; color: var(--teal); font-size: 13px; font-weight: 800; letter-spacing: .12em; white-space: nowrap; }
+.flag { display: inline-block; width: 25px; height: 17px; margin-right: 7px; vertical-align: -3px; border-radius: 3px; background: linear-gradient(#2479bc 0 50%, #ffce3f 50%); }
+h1 { margin: 0; font-size: clamp(56px, 6.9vw, 96px); font-weight: 900; line-height: 1.04; letter-spacing: -.05em; }
+h1 span { color: #fff1c8; }
+.lead { max-width: 530px; margin: 26px 0 32px; color: var(--muted); font-size: clamp(16px, 1.6vw, 20px); line-height: 1.5; }
+.install {
+  display: inline-flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 58px;
+  padding: 13px 22px;
+  border: 2px solid #080b1a;
+  border-radius: 18px;
+  background: var(--yellow);
+  box-shadow: 0 5px 0 #080b1a;
+  color: #261c2d;
+  font-weight: 900;
+  transition: background-color .18s, transform .18s;
+}
+.install:hover { background: #ffe07a; transform: translateY(-2px); }
+.install span { font-size: 24px; line-height: .8; }
+.release-status { margin: 21px 0 0; color: #aaa1c1; font-size: 13px; }
+.art { position: relative; width: 100%; height: min(60vh, 490px); pointer-events: none; }
+.disc { position: absolute; left: 50%; top: 50%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); border: 4px solid #0a0d1a; }
+.disc-outer { width: min(95%, 480px); background: #30264e; }
+.disc-inner { width: min(67%, 330px); background: #493566; }
+.wave { position: absolute; z-index: 2; width: 110%; height: 46%; left: -5%; top: 27%; overflow: visible; fill: none; stroke-linecap: round; }
+.wave-back path { stroke: #8276b2; stroke-width: 4; }
+.wave-front path { stroke: var(--teal); stroke-width: 8; }
+.mic { position: absolute; z-index: 3; left: 50%; top: 50%; width: 115px; height: 200px; transform: translate(-50%, -50%) rotate(-9deg); filter: drop-shadow(8px 10px 0 #0b0d1d); }
+.mic-head { position: absolute; top: 3px; left: 9px; width: 100px; height: 127px; border: 7px solid #111322; border-radius: 56px; background: linear-gradient(120deg, #51486d, #28243f); }
+.mic-head::after { content: ""; position: absolute; inset: 22px 28px; border-inline: 4px solid #a69bc8; opacity: .7; }
+.mic-stem { position: absolute; top: 118px; left: 55px; width: 14px; height: 60px; border-radius: 7px; background: #1a1b2e; }
+.mic-foot { position: absolute; bottom: 6px; left: 17px; width: 90px; height: 13px; border-radius: 12px; background: #17192b; }
+.orbit-dot { position: absolute; z-index: 4; width: 29px; height: 29px; border: 8px solid var(--yellow); border-radius: 50%; background: #fff6d0; left: 13%; top: 29%; }
+.footer { display: flex; justify-content: space-between; gap: 16px; padding-bottom: clamp(18px, 3vh, 28px); color: #958daa; font-size: 12px; }
+@media (max-width: 800px) {
+  .hero { grid-template-columns: 1fr; }
+  .art { position: absolute; z-index: 0; width: min(55vw, 340px); height: min(55vw, 340px); right: -12%; top: 47%; opacity: .22; }
+  .copy { max-width: 620px; padding-bottom: 0; }
+}
+@media (max-width: 600px) {
+  .wrap { width: calc(100% - 36px); }
+  .topbar { gap: 10px; }
+  .brand { gap: 6px; }
+  .brand img { width: 29px; height: 29px; }
+  .brand span { font-size: 16px; }
+  nav { gap: 12px; font-size: 13px; }
+  .eyebrow { font-size: 10px; letter-spacing: .07em; }
+  h1 { font-size: clamp(31px, 9vw, 52px); }
+  .lead { max-width: 410px; font-size: 16px; margin: 21px 0 25px; }
+  .install { min-height: 52px; padding: 11px 16px; font-size: 14px; }
+  .footer { font-size: 10px; }
+  .footer span:last-child { display: none; }
+}
+@media (max-width: 420px) {
+  .brand img { width: 24px; height: 24px; }
+  .brand span { font-size: 14px; }
+  nav { gap: 10px; font-size: 12px; }
+}
+@media (max-height: 640px) {
+  h1 { font-size: clamp(45px, 6vw, 70px); }
+  .lead { margin-block: 15px 20px; }
+  .release-status { margin-top: 13px; }
+  .art { height: min(58vh, 350px); }
+}
+@media (max-height: 520px) {
+  .art { display: none; }
+  .footer { padding-bottom: 10px; }
+  .copy { padding-bottom: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .wave-front { animation: float 6s ease-in-out infinite; }
+  .mic { animation: sway 5s ease-in-out infinite; }
+  @keyframes float { 50% { transform: translateY(6px); } }
+  @keyframes sway { 50% { transform: translate(-50%, -50%) rotate(-5deg); } }
+}
