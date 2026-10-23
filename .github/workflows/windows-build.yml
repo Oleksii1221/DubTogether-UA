@@ -4,6 +4,9 @@ on:
     branches: [dev]
   workflow_dispatch:
 
+env:
+  PYTHONIOENCODING: utf-8
+
 jobs:
   windows:
     runs-on: windows-latest
