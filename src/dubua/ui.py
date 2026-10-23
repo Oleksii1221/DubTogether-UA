@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import math
 import sys
+import time
 from pathlib import Path
 
 from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QRectF, Qt, QThread, QTimer, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPainterPath, QPen, QPixmap
-from PySide6.QtTest import QTest
 from PySide6.QtWidgets import (
     QApplication, QDialog, QFrame, QGraphicsOpacityEffect, QHBoxLayout,
     QLabel, QLineEdit, QMainWindow, QProgressBar, QPushButton, QStackedWidget,
@@ -427,7 +427,8 @@ def run_app(screenshot: Path | None = None, guide: bool = False) -> int:
             window._show_guide()
         window.show()
         app.processEvents()
-        QTest.qWait(310)
+        time.sleep(0.31)
+        app.processEvents()
         screenshot.parent.mkdir(parents=True, exist_ok=True)
         window.grab().save(str(screenshot))
         window.close()

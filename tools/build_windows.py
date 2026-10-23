@@ -18,12 +18,14 @@ def main() -> None:
     if missing:
         raise SystemExit("Missing installer assets: " + ", ".join(missing))
     subprocess.run([sys.executable, str(ROOT / "tools" / "audit_translations.py")], check=True)
-    # Poppler's ICU DLLs can shadow the Windows ICU used by Qt.  Some developer
-    # environments put Poppler on PATH; exclude it while PyInstaller scans DLLs.
+    # Image/PDF tools in developer runtimes carry unrelated ICU and CRT DLLs.
+    # Keep those directories out of PyInstaller's dependency scan.
     build_env = os.environ.copy()
     build_env["PATH"] = os.pathsep.join(
         part for part in build_env.get("PATH", "").split(os.pathsep)
         if "poppler" not in part.casefold()
+        and not ("codex-primary-runtime" in part.casefold()
+                 and "dependencies\\native" in part.casefold())
     )
     subprocess.run([
         sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--windowed",
