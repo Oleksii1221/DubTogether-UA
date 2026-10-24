@@ -24,6 +24,16 @@ SITE_ASSETS = ASSETS / "screenshots"
 
 STYLESHEET = """
 QWidget { background: #0e1328; color: #f9f6ff; font-family: 'Nunito', 'Segoe UI'; font-size: 15px; }
+QFrame#windowRoot { background: #0e1328; border: 1px solid #080b1b; }
+QFrame#titleBar { background: #0a0f22; border: none; border-bottom: 1px solid #2f274e; }
+QFrame#titleBar QLabel { background: transparent; }
+QLabel#windowTitle { color: #eee9f7; font-size: 12px; }
+QPushButton#windowControl, QPushButton#windowClose {
+    background: transparent; color: #b8afd0; border: none; border-radius: 0;
+    padding: 0; min-height: 0; font-family: 'Segoe UI'; font-size: 17px; font-weight: 400;
+}
+QPushButton#windowControl:hover { background: #2b2448; color: #fffaf0; }
+QPushButton#windowClose:hover { background: #e85d68; color: #ffffff; }
 QFrame#card { background: #18142f; border: 2px solid #080b1b; border-radius: 25px; }
 QFrame#inner { background: #241e3c; border: 1px solid #51416b; border-radius: 17px; }
 QLabel#brand { font-family: 'Lilita One'; font-size: 25px; font-weight: 400; color: #fff9ed; }
@@ -69,6 +79,61 @@ def button(text: str, role: str, callback=None) -> QPushButton:
     if callback:
         item.clicked.connect(callback)
     return item
+
+
+class TitleBar(QFrame):
+    """Theme-owned title bar so Windows light mode cannot recolor the app."""
+
+    def __init__(self, owner: QWidget, title: str, show_minimize: bool = True):
+        super().__init__(owner)
+        self.owner = owner
+        self._drag_offset = None
+        self.setObjectName("titleBar")
+        self.setFixedHeight(34)
+
+        row = QHBoxLayout(self)
+        row.setContentsMargins(10, 0, 0, 0)
+        row.setSpacing(8)
+
+        icon = QLabel()
+        icon.setPixmap(QPixmap(str(ASSETS / "app.png")).scaled(18, 18, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        icon.setFixedSize(18, 18)
+        row.addWidget(icon)
+
+        caption = label(title, "windowTitle", False)
+        row.addWidget(caption)
+        row.addStretch()
+
+        if show_minimize:
+            minimize = QPushButton("−")
+            minimize.setObjectName("windowControl")
+            minimize.setAccessibleName("Згорнути")
+            minimize.setFixedSize(44, 33)
+            minimize.setCursor(Qt.PointingHandCursor)
+            minimize.clicked.connect(owner.showMinimized)
+            row.addWidget(minimize)
+
+        close = QPushButton("×")
+        close.setObjectName("windowClose")
+        close.setAccessibleName("Закрити")
+        close.setFixedSize(46, 33)
+        close.setCursor(Qt.PointingHandCursor)
+        close.clicked.connect(owner.close)
+        row.addWidget(close)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self._drag_offset = event.globalPosition().toPoint() - self.owner.frameGeometry().topLeft()
+            event.accept()
+
+    def mouseMoveEvent(self, event):
+        if self._drag_offset is not None and event.buttons() & Qt.LeftButton:
+            self.owner.move(event.globalPosition().toPoint() - self._drag_offset)
+            event.accept()
+
+    def mouseReleaseEvent(self, event):
+        self._drag_offset = None
+        event.accept()
 
 
 class Flag(QWidget):
@@ -177,10 +242,17 @@ class ConfirmDialog(QDialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setWindowTitle("Підтвердження")
+        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.setModal(True)
         self.setFixedWidth(520)
-        root = QVBoxLayout(self)
-        root.setContentsMargins(30, 29, 30, 26)
+        shell = QVBoxLayout(self)
+        shell.setContentsMargins(1, 1, 1, 1)
+        shell.setSpacing(0)
+        shell.addWidget(TitleBar(self, "Підтвердження", show_minimize=False))
+        content = QWidget()
+        shell.addWidget(content)
+        root = QVBoxLayout(content)
+        root.setContentsMargins(30, 25, 30, 26)
         root.setSpacing(19)
         root.addWidget(label("ПЕРЕД ВСТАНОВЛЕННЯМ", "kicker"))
         root.addWidget(label("Dub Together буде закрито", "pageTitle"))
@@ -201,15 +273,24 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Dub Together UA — український переклад")
         self.setWindowIcon(QIcon(str(ASSETS / "app.png")))
-        self.setFixedSize(970, 740)
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+        self.setFixedSize(970, 772)
         self.setStyleSheet(STYLESHEET)
         self.pack: Path | None = None
         self.worker: InstallThread | None = None
         self.guide_step = 0
         self.animation = None
-        outer = QWidget()
+        outer = QFrame()
+        outer.setObjectName("windowRoot")
         self.setCentralWidget(outer)
-        root = QVBoxLayout(outer)
+        shell = QVBoxLayout(outer)
+        shell.setContentsMargins(1, 1, 1, 1)
+        shell.setSpacing(0)
+        shell.addWidget(TitleBar(self, self.windowTitle()))
+
+        content = QWidget()
+        shell.addWidget(content, 1)
+        root = QVBoxLayout(content)
         root.setContentsMargins(28, 23, 28, 19)
         root.setSpacing(17)
 
