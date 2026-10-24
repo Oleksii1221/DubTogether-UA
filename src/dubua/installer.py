@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Callable
 
@@ -14,14 +15,33 @@ ASSETS = Path(__file__).resolve().parent / "assets"
 PACK_NAME = "DubTogether-UA.pck"
 
 
-def output_path() -> Path:
-    local = os.environ.get("LOCALAPPDATA")
-    if not local:
-        raise PackError("Windows не надав шлях LOCALAPPDATA.")
-    return Path(local) / "DubTogether-UA" / PACK_NAME
+def output_path(game_exe: Path | None = None) -> Path:
+    if sys.platform == "win32":
+        local = os.environ.get("LOCALAPPDATA")
+        if not local:
+            raise PackError("Windows не надав шлях LOCALAPPDATA.")
+        return Path(local) / "DubTogether-UA" / PACK_NAME
+    if sys.platform.startswith("linux"):
+        data_home = os.environ.get("XDG_DATA_HOME")
+        if data_home:
+            root = Path(data_home).expanduser()
+        else:
+            flatpak_home = Path.home() / ".var" / "app" / "com.valvesoftware.Steam"
+            try:
+                in_flatpak_steam = game_exe is not None and game_exe.resolve().is_relative_to(flatpak_home.resolve())
+            except OSError:
+                in_flatpak_steam = False
+            root = flatpak_home / "data" if in_flatpak_steam else Path.home() / ".local" / "share"
+        return root / "DubTogether-UA" / PACK_NAME
+    raise PackError("Ця операційна система поки не підтримується.")
 
 
 def launch_option(pack: Path) -> str:
+    if sys.platform.startswith("linux"):
+        # Dub Together ships only a Windows build. Proton exposes Linux files through drive Z:.
+        absolute = pack.expanduser().resolve(strict=False).as_posix()
+        proton_path = "Z:" + absolute.replace("/", "\\")
+        return f'--main-pack "{proton_path}"'
     return f'--main-pack "{pack}"'
 
 
@@ -55,4 +75,4 @@ def install(
     patches, added = load_assets()
     if progress:
         progress(30, "Готуємо українські файли")
-    return build_pack(game, destination or output_path(), patches, added, progress)
+    return build_pack(game, destination or output_path(game), patches, added, progress)

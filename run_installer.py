@@ -1,4 +1,4 @@
-"""PyInstaller entry point for the packaged Windows application."""
+"""PyInstaller entry point for the packaged desktop application."""
 
 from dubua.__main__ import main
 

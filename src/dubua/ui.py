@@ -1,4 +1,4 @@
-"""A small, game-inspired Windows wizard built with PySide6."""
+"""A small, game-inspired installer wizard built with PySide6."""
 
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ from .installer import ASSETS, install, launch_option, output_path
 GITHUB = "https://github.com/Oleksii1221/DubTogether-UA"
 STEAM = "https://steamcommunity.com/profiles/76561199256076885"
 SITE_ASSETS = ASSETS / "screenshots"
+PLATFORM_LABEL = "LINUX  ·  STEAM PROTON" if sys.platform.startswith("linux") else "WINDOWS"
 
 STYLESHEET = """
 QWidget { background: #0e1328; color: #f9f6ff; font-family: 'Nunito', 'Segoe UI'; font-size: 15px; }
@@ -113,7 +114,7 @@ def button(text: str, role: str, callback=None) -> QPushButton:
 
 
 class TitleBar(QFrame):
-    """Theme-owned title bar so Windows light mode cannot recolor the app."""
+    """Theme-owned title bar independent of the desktop color scheme."""
 
     def __init__(self, owner: QWidget, title: str, show_minimize: bool = True):
         super().__init__(owner)
@@ -289,7 +290,7 @@ class ConfirmDialog(QDialog):
         root.setSpacing(19)
         root.addWidget(label("ПЕРЕД ВСТАНОВЛЕННЯМ", "kicker"))
         root.addWidget(label("Dub Together буде закрито", "pageTitle"))
-        root.addWidget(label("Збережи прогрес у грі. Після підтвердження програма закриє її вікно й створить український пак. Відповідь «Назад» залишить гру відкритою.", "muted"))
+        root.addWidget(label("Збережи прогрес у грі. Після підтвердження програма попросить гру завершитися й створить український пак. Відповідь «Назад» залишить гру відкритою.", "muted"))
         if not running_games():
             root.addWidget(label("Зараз гра не запущена. Інсталятор продовжить без закриття вікна.", "kicker"))
         row = QHBoxLayout()
@@ -378,9 +379,9 @@ class MainWindow(QMainWindow):
         left = QVBoxLayout()
         left.setSpacing(14)
         left.addStretch(1)
-        left.addWidget(label("УКРАЇНСЬКИЙ ПЕРЕКЛАД  ·  WINDOWS", "kicker"))
+        left.addWidget(label(f"УКРАЇНСЬКИЙ ПЕРЕКЛАД  ·  {PLATFORM_LABEL}", "kicker"))
         left.addWidget(label("Грайте\nукраїнською", "heading"))
-        left.addWidget(label("Переклад меню, підказок і реплік інтерфейсу Dub Together. Встановлення займає кілька кроків — ми покажемо кожен із них.", "muted"))
+        left.addWidget(label("Переклад меню, підказок і реплік Dub Together. Linux-версія працює з Windows-збіркою гри через Steam Proton.", "muted"))
         left.addSpacing(10)
         actions = QHBoxLayout()
         actions.addWidget(button("Почати встановлення  >", "primary", self._confirm_start))
@@ -566,7 +567,7 @@ def run_app(screenshot: Path | None = None, guide: bool = False) -> int:
     window = MainWindow()
     if screenshot:
         if guide:
-            window.pack = Path(r"C:\Users\Player\AppData\Local\DubTogether-UA\DubTogether-UA.pck")
+            window.pack = output_path()
             window._show_guide()
         window.show()
         app.processEvents()
