@@ -54,10 +54,8 @@ QPushButton#secondary { background: #3b2f58; color: #f9f5ff; }
 QPushButton#secondary:hover { background: #554170; }
 QPushButton#danger { background: #f47771; color: #281d2c; }
 QPushButton#danger:hover { background: #ff9288; }
-QPushButton#link { border: none; color: #c4b6e1; background: transparent; text-decoration: underline; padding: 3px; }
-QPushButton#link:hover { color: #fff1a0; }
-QPushButton#plainLink { border: none; color: #c4b6e1; background: transparent; padding: 3px; }
-QPushButton#plainLink:hover { color: #fff1a0; }
+QLabel#textAction { color: #c4b6e1; background: transparent; padding: 3px; font-size: 15px; font-weight: 900; }
+QLabel#textAction:hover { color: #fff1a0; }
 QPushButton:disabled { background: #554b68; color: #aca5b7; }
 QLabel#launchOption { background: #0d1022; color: #f9f7ff; border: 1px solid #5e5277; border-radius: 11px; padding: 10px 12px; min-height: 23px; }
 QTextEdit { background: #111328; color: #bcb5d3; border: 1px solid #453a62; border-radius: 12px; padding: 10px; }
@@ -82,6 +80,26 @@ class AppButton(QPushButton):
         super().mouseReleaseEvent(event)
         if event.button() == Qt.LeftButton:
             self.clearFocus()
+
+
+class ActionLabel(QLabel):
+    """Compact mouse action rendered as text without button focus decoration."""
+
+    clicked = Signal()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+        super().mouseReleaseEvent(event)
+
+
+def action_label(text: str, callback) -> ActionLabel:
+    item = ActionLabel(text)
+    item.setObjectName("textAction")
+    item.setCursor(Qt.PointingHandCursor)
+    item.setAccessibleName(text)
+    item.clicked.connect(callback)
+    return item
 
 
 def button(text: str, role: str, callback=None) -> QPushButton:
@@ -349,8 +367,8 @@ class MainWindow(QMainWindow):
         footer.setSpacing(16)
         footer.addWidget(label(f"v{__version__}   ·   {__author__}", "footer", False))
         footer.addStretch()
-        footer.addWidget(button("Steam", "link", lambda: QDesktopServices.openUrl(QUrl(STEAM))))
-        footer.addWidget(button("GitHub", "link", lambda: QDesktopServices.openUrl(QUrl(GITHUB))))
+        footer.addWidget(action_label("Steam", lambda: QDesktopServices.openUrl(QUrl(STEAM))))
+        footer.addWidget(action_label("GitHub", lambda: QDesktopServices.openUrl(QUrl(GITHUB))))
         root.addLayout(footer)
 
     def _make_welcome(self):
@@ -372,7 +390,7 @@ class MainWindow(QMainWindow):
             existing = output_path()
             if existing.is_file() and existing.stat().st_size > 1_000_000:
                 self.pack = existing
-                left.addWidget(button("Пак уже є · перейти до інструкції", "link", self._open_existing))
+                left.addWidget(action_label("Пак уже є · перейти до інструкції", self._open_existing))
         except OSError:
             pass
         left.addStretch(1)
@@ -435,7 +453,7 @@ class MainWindow(QMainWindow):
         nav.addWidget(self.prev_step)
         nav.addWidget(self.next_step)
         nav.addStretch()
-        nav.addWidget(button("На початок", "plainLink", self._return_to_welcome))
+        nav.addWidget(action_label("На початок", self._return_to_welcome))
         body.addLayout(nav)
         self.pages.addWidget(page)
         self._set_guide_step(0)
@@ -514,7 +532,7 @@ class MainWindow(QMainWindow):
             self.guide_image.setPixmap(pixmap.scaled(820, 180, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         else:
             self.guide_image.setText("Зображення інструкції недоступне")
-        self.prev_step.setEnabled(number > 0)
+        self.prev_step.setVisible(number > 0)
         self.next_step.setText("Готово" if number == 1 else "Далі >")
 
     def _guide_next(self):
