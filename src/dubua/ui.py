@@ -20,6 +20,7 @@ from .game import running_games
 from .installer import ASSETS, install, launch_option, output_path
 
 GITHUB = "https://github.com/Oleksii1221/DubTogether-UA"
+STEAM = "https://steamcommunity.com/profiles/76561199256076885"
 SITE_ASSETS = ASSETS / "screenshots"
 
 STYLESHEET = """
@@ -44,7 +45,7 @@ QLabel#kicker { color: #23c8ac; font-size: 13px; font-weight: 900; letter-spacin
 QLabel#muted { color: #b8afd0; }
 QLabel#step { color: #9187b0; font-weight: 800; font-size: 12px; }
 QLabel#activeStep { color: #ffe17b; font-weight: 900; font-size: 12px; }
-QLabel#footer { color: #8882a1; font-size: 12px; }
+QLabel#footer { color: #c4b6e1; font-size: 15px; font-weight: 800; }
 QPushButton { padding: 10px 20px; border-radius: 17px; border: 2px solid #080b1b; font-weight: 900; min-height: 23px; }
 QPushButton#primary { background: #ffca3b; color: #251e28; }
 QPushButton#primary:hover { background: #ffdc6a; }
@@ -331,8 +332,10 @@ class MainWindow(QMainWindow):
         self._make_guide()
 
         footer = QHBoxLayout()
+        footer.setSpacing(16)
         footer.addWidget(label(f"v{__version__}   ·   {__author__}", "footer", False))
         footer.addStretch()
+        footer.addWidget(button("Steam", "link", lambda: QDesktopServices.openUrl(QUrl(STEAM))))
         footer.addWidget(button("GitHub", "link", lambda: QDesktopServices.openUrl(QUrl(GITHUB))))
         root.addLayout(footer)
 
