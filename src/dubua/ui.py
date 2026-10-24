@@ -75,10 +75,20 @@ def label(text: str, role: str | None = None, wrap: bool = True) -> QLabel:
     return item
 
 
+class AppButton(QPushButton):
+    """Keep keyboard focus support without leaving a ring after mouse clicks."""
+
+    def mouseReleaseEvent(self, event):
+        super().mouseReleaseEvent(event)
+        if event.button() == Qt.LeftButton:
+            self.clearFocus()
+
+
 def button(text: str, role: str, callback=None) -> QPushButton:
-    item = QPushButton(text)
+    item = AppButton(text)
     item.setObjectName(role)
     item.setCursor(Qt.PointingHandCursor)
+    item.setFocusPolicy(Qt.TabFocus)
     if callback:
         item.clicked.connect(callback)
     return item
@@ -108,19 +118,21 @@ class TitleBar(QFrame):
         row.addStretch()
 
         if show_minimize:
-            minimize = QPushButton("−")
+            minimize = AppButton("−")
             minimize.setObjectName("windowControl")
             minimize.setAccessibleName("Згорнути")
             minimize.setFixedSize(44, 33)
             minimize.setCursor(Qt.PointingHandCursor)
+            minimize.setFocusPolicy(Qt.TabFocus)
             minimize.clicked.connect(owner.showMinimized)
             row.addWidget(minimize)
 
-        close = QPushButton("×")
+        close = AppButton("×")
         close.setObjectName("windowClose")
         close.setAccessibleName("Закрити")
         close.setFixedSize(46, 33)
         close.setCursor(Qt.PointingHandCursor)
+        close.setFocusPolicy(Qt.TabFocus)
         close.clicked.connect(owner.close)
         row.addWidget(close)
 
