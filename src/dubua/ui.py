@@ -403,11 +403,6 @@ class MainWindow(QMainWindow):
         option_row.addWidget(self.option, 1)
         option_row.addWidget(button("Копіювати", "primary", self._copy_option))
         body.addLayout(option_row)
-        path_row = QHBoxLayout()
-        self.path_label = label("", "muted")
-        path_row.addWidget(self.path_label, 1)
-        path_row.addWidget(button("Копіювати шлях", "secondary", self._copy_path))
-        body.addLayout(path_row)
 
         visual = QFrame()
         visual.setObjectName("inner")
@@ -487,8 +482,6 @@ class MainWindow(QMainWindow):
             return
         self.option.setText(launch_option(self.pack))
         self.option.setToolTip(self.option.text())
-        self.path_label.setText("Пак: " + str(self.pack))
-        self.path_label.setToolTip(str(self.pack))
         self._set_guide_step(0)
         self._set_page(2)
 
@@ -519,11 +512,6 @@ class MainWindow(QMainWindow):
     def _copy_option(self):
         QApplication.clipboard().setText(self.option.text())
         self.guide_title.setText("Рядок скопійовано · встав його в параметри запуску Steam")
-
-    def _copy_path(self):
-        if self.pack:
-            QApplication.clipboard().setText(str(self.pack))
-            self.guide_title.setText("Шлях до пака скопійовано")
 
     def _return_to_welcome(self):
         self.stage.setStyleSheet("")
