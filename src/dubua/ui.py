@@ -56,6 +56,8 @@ QPushButton#danger { background: #f47771; color: #281d2c; }
 QPushButton#danger:hover { background: #ff9288; }
 QPushButton#link { border: none; color: #c4b6e1; background: transparent; text-decoration: underline; padding: 3px; }
 QPushButton#link:hover { color: #fff1a0; }
+QPushButton#plainLink { border: none; color: #c4b6e1; background: transparent; padding: 3px; }
+QPushButton#plainLink:hover { color: #fff1a0; }
 QPushButton:disabled { background: #554b68; color: #aca5b7; }
 QLabel#launchOption { background: #0d1022; color: #f9f7ff; border: 1px solid #5e5277; border-radius: 11px; padding: 10px 12px; min-height: 23px; }
 QTextEdit { background: #111328; color: #bcb5d3; border: 1px solid #453a62; border-radius: 12px; padding: 10px; }
@@ -421,7 +423,7 @@ class MainWindow(QMainWindow):
         nav.addWidget(self.prev_step)
         nav.addWidget(self.next_step)
         nav.addStretch()
-        nav.addWidget(button("На початок", "link", self._return_to_welcome))
+        nav.addWidget(button("На початок", "plainLink", self._return_to_welcome))
         body.addLayout(nav)
         self.pages.addWidget(page)
         self._set_guide_step(0)
