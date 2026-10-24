@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import QEasingCurve, QEventLoop, QPropertyAnimation, QRectF, Qt, QThread, QTimer, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QLinearGradient, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QDialog, QFrame, QGraphicsOpacityEffect, QHBoxLayout,
     QLabel, QMainWindow, QProgressBar, QPushButton, QSizePolicy, QStackedWidget,
@@ -20,10 +20,21 @@ from .game import running_games
 from .installer import ASSETS, install, launch_option, output_path
 
 GITHUB = "https://github.com/Oleksii1221/DubTogether-UA"
+STEAM = "https://steamcommunity.com/profiles/76561199256076885"
 SITE_ASSETS = ASSETS / "screenshots"
 
 STYLESHEET = """
 QWidget { background: #0e1328; color: #f9f6ff; font-family: 'Nunito', 'Segoe UI'; font-size: 15px; }
+QFrame#windowRoot { background: #0e1328; border: 1px solid #080b1b; }
+QFrame#titleBar { background: #0a0f22; border: none; border-bottom: 1px solid #2f274e; }
+QFrame#titleBar QLabel { background: transparent; }
+QLabel#windowTitle { color: #eee9f7; font-size: 12px; }
+QPushButton#windowControl, QPushButton#windowClose {
+    background: transparent; color: #b8afd0; border: none; border-radius: 0;
+    padding: 0; min-height: 0; font-family: 'Segoe UI'; font-size: 17px; font-weight: 400;
+}
+QPushButton#windowControl:hover { background: #2b2448; color: #fffaf0; }
+QPushButton#windowClose:hover { background: #e85d68; color: #ffffff; }
 QFrame#card { background: #18142f; border: 2px solid #080b1b; border-radius: 25px; }
 QFrame#inner { background: #241e3c; border: 1px solid #51416b; border-radius: 17px; }
 QLabel#brand { font-family: 'Lilita One'; font-size: 25px; font-weight: 400; color: #fff9ed; }
@@ -34,7 +45,7 @@ QLabel#kicker { color: #23c8ac; font-size: 13px; font-weight: 900; letter-spacin
 QLabel#muted { color: #b8afd0; }
 QLabel#step { color: #9187b0; font-weight: 800; font-size: 12px; }
 QLabel#activeStep { color: #ffe17b; font-weight: 900; font-size: 12px; }
-QLabel#footer { color: #8882a1; font-size: 12px; }
+QLabel#footer { color: #c4b6e1; font-size: 15px; font-weight: 800; }
 QPushButton { padding: 10px 20px; border-radius: 17px; border: 2px solid #080b1b; font-weight: 900; min-height: 23px; }
 QPushButton#primary { background: #ffca3b; color: #251e28; }
 QPushButton#primary:hover { background: #ffdc6a; }
@@ -43,8 +54,8 @@ QPushButton#secondary { background: #3b2f58; color: #f9f5ff; }
 QPushButton#secondary:hover { background: #554170; }
 QPushButton#danger { background: #f47771; color: #281d2c; }
 QPushButton#danger:hover { background: #ff9288; }
-QPushButton#link { border: none; color: #c4b6e1; background: transparent; text-decoration: underline; padding: 3px; }
-QPushButton#link:hover { color: #fff1a0; }
+QLabel#textAction { color: #c4b6e1; background: transparent; padding: 3px; font-size: 15px; font-weight: 900; }
+QLabel#textAction:hover { color: #fff1a0; }
 QPushButton:disabled { background: #554b68; color: #aca5b7; }
 QLabel#launchOption { background: #0d1022; color: #f9f7ff; border: 1px solid #5e5277; border-radius: 11px; padding: 10px 12px; min-height: 23px; }
 QTextEdit { background: #111328; color: #bcb5d3; border: 1px solid #453a62; border-radius: 12px; padding: 10px; }
@@ -62,13 +73,100 @@ def label(text: str, role: str | None = None, wrap: bool = True) -> QLabel:
     return item
 
 
+class AppButton(QPushButton):
+    """Keep keyboard focus support without leaving a ring after mouse clicks."""
+
+    def mouseReleaseEvent(self, event):
+        super().mouseReleaseEvent(event)
+        if event.button() == Qt.LeftButton:
+            self.clearFocus()
+
+
+class ActionLabel(QLabel):
+    """Compact mouse action rendered as text without button focus decoration."""
+
+    clicked = Signal()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+        super().mouseReleaseEvent(event)
+
+
+def action_label(text: str, callback) -> ActionLabel:
+    item = ActionLabel(text)
+    item.setObjectName("textAction")
+    item.setCursor(Qt.PointingHandCursor)
+    item.setAccessibleName(text)
+    item.clicked.connect(callback)
+    return item
+
+
 def button(text: str, role: str, callback=None) -> QPushButton:
-    item = QPushButton(text)
+    item = AppButton(text)
     item.setObjectName(role)
     item.setCursor(Qt.PointingHandCursor)
+    item.setFocusPolicy(Qt.TabFocus)
     if callback:
         item.clicked.connect(callback)
     return item
+
+
+class TitleBar(QFrame):
+    """Theme-owned title bar so Windows light mode cannot recolor the app."""
+
+    def __init__(self, owner: QWidget, title: str, show_minimize: bool = True):
+        super().__init__(owner)
+        self.owner = owner
+        self._drag_offset = None
+        self.setObjectName("titleBar")
+        self.setFixedHeight(34)
+
+        row = QHBoxLayout(self)
+        row.setContentsMargins(10, 0, 0, 0)
+        row.setSpacing(8)
+
+        icon = QLabel()
+        icon.setPixmap(QPixmap(str(ASSETS / "app.png")).scaled(18, 18, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        icon.setFixedSize(18, 18)
+        row.addWidget(icon)
+
+        caption = label(title, "windowTitle", False)
+        row.addWidget(caption)
+        row.addStretch()
+
+        if show_minimize:
+            minimize = AppButton("−")
+            minimize.setObjectName("windowControl")
+            minimize.setAccessibleName("Згорнути")
+            minimize.setFixedSize(44, 33)
+            minimize.setCursor(Qt.PointingHandCursor)
+            minimize.setFocusPolicy(Qt.TabFocus)
+            minimize.clicked.connect(owner.showMinimized)
+            row.addWidget(minimize)
+
+        close = AppButton("×")
+        close.setObjectName("windowClose")
+        close.setAccessibleName("Закрити")
+        close.setFixedSize(46, 33)
+        close.setCursor(Qt.PointingHandCursor)
+        close.setFocusPolicy(Qt.TabFocus)
+        close.clicked.connect(owner.close)
+        row.addWidget(close)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self._drag_offset = event.globalPosition().toPoint() - self.owner.frameGeometry().topLeft()
+            event.accept()
+
+    def mouseMoveEvent(self, event):
+        if self._drag_offset is not None and event.buttons() & Qt.LeftButton:
+            self.owner.move(event.globalPosition().toPoint() - self._drag_offset)
+            event.accept()
+
+    def mouseReleaseEvent(self, event):
+        self._drag_offset = None
+        event.accept()
 
 
 class Flag(QWidget):
@@ -87,7 +185,7 @@ class Flag(QWidget):
 
 
 class Waveform(QWidget):
-    """Original, subtle voice-wave art inspired by the game's palette."""
+    """Animated voice-wave and microphone art shared with the website."""
 
     def __init__(self):
         super().__init__()
@@ -105,11 +203,13 @@ class Waveform(QWidget):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         w, h = self.width(), self.height()
+        diameter = min(w * .88, h * .86)
+        inner = diameter * .67
         p.setPen(Qt.NoPen)
         p.setBrush(QColor("#30264f"))
-        p.drawEllipse(QRectF(w * .13, h * .06, w * .75, h * .87))
+        p.drawEllipse(QRectF((w - diameter) / 2, (h - diameter) / 2, diameter, diameter))
         p.setBrush(QColor("#463468"))
-        p.drawEllipse(QRectF(w * .24, h * .18, w * .52, h * .64))
+        p.drawEllipse(QRectF((w - inner) / 2, (h - inner) / 2, inner, inner))
         for color, scale, phase in (("#6f61aa", 1.0, 0), ("#20bca8", .70, 1.0)):
             path = QPainterPath()
             for x in range(0, w + 2, 2):
@@ -122,11 +222,40 @@ class Waveform(QWidget):
                     path.lineTo(x, y)
             p.setPen(QPen(QColor(color), 5 if scale == .70 else 3, Qt.SolidLine, Qt.RoundCap))
             p.drawPath(path)
+
+        # Match the CSS microphone on the website, including its slight sway.
+        mic_scale = diameter / 360
+        p.save()
+        p.translate(w * .52, h * .5)
+        p.rotate(-9 + math.sin(self.phase * .55) * 2)
+        p.scale(mic_scale, mic_scale)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor("#0b0d1d"))
+        p.drawRoundedRect(QRectF(-42, -85, 100, 127), 50, 50)
+        p.drawRoundedRect(QRectF(1, 28, 14, 62), 7, 7)
+        p.drawRoundedRect(QRectF(-37, 86, 90, 14), 7, 7)
+
+        head_gradient = QLinearGradient(-50, -95, 50, 32)
+        head_gradient.setColorAt(0, QColor("#51486d"))
+        head_gradient.setColorAt(1, QColor("#28243f"))
+        p.setBrush(head_gradient)
+        p.setPen(QPen(QColor("#111322"), 7))
+        p.drawRoundedRect(QRectF(-50, -95, 100, 127), 50, 50)
+        p.setPen(QPen(QColor("#a69bc8"), 4))
+        p.drawLine(-22, -70, -22, 8)
+        p.drawLine(22, -70, 22, 8)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor("#1a1b2e"))
+        p.drawRoundedRect(QRectF(-7, 20, 14, 64), 7, 7)
+        p.setBrush(QColor("#17192b"))
+        p.drawRoundedRect(QRectF(-45, 78, 90, 14), 7, 7)
+        p.restore()
+
         p.setPen(Qt.NoPen)
         p.setBrush(QColor("#ffce41"))
-        p.drawEllipse(QRectF(w * .47, h * .43, 24, 24))
+        p.drawEllipse(QRectF(w * .13, h * .29, 24, 24))
         p.setBrush(QColor("#fff8d9"))
-        p.drawEllipse(QRectF(w * .47 + 7, h * .43 + 7, 10, 10))
+        p.drawEllipse(QRectF(w * .13 + 7, h * .29 + 7, 10, 10))
 
 
 class InstallThread(QThread):
@@ -146,10 +275,17 @@ class ConfirmDialog(QDialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setWindowTitle("Підтвердження")
+        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.setModal(True)
         self.setFixedWidth(520)
-        root = QVBoxLayout(self)
-        root.setContentsMargins(30, 29, 30, 26)
+        shell = QVBoxLayout(self)
+        shell.setContentsMargins(1, 1, 1, 1)
+        shell.setSpacing(0)
+        shell.addWidget(TitleBar(self, "Підтвердження", show_minimize=False))
+        content = QWidget()
+        shell.addWidget(content)
+        root = QVBoxLayout(content)
+        root.setContentsMargins(30, 25, 30, 26)
         root.setSpacing(19)
         root.addWidget(label("ПЕРЕД ВСТАНОВЛЕННЯМ", "kicker"))
         root.addWidget(label("Dub Together буде закрито", "pageTitle"))
@@ -170,15 +306,24 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Dub Together UA — український переклад")
         self.setWindowIcon(QIcon(str(ASSETS / "app.png")))
-        self.setFixedSize(970, 740)
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+        self.setFixedSize(970, 772)
         self.setStyleSheet(STYLESHEET)
         self.pack: Path | None = None
         self.worker: InstallThread | None = None
         self.guide_step = 0
         self.animation = None
-        outer = QWidget()
+        outer = QFrame()
+        outer.setObjectName("windowRoot")
         self.setCentralWidget(outer)
-        root = QVBoxLayout(outer)
+        shell = QVBoxLayout(outer)
+        shell.setContentsMargins(1, 1, 1, 1)
+        shell.setSpacing(0)
+        shell.addWidget(TitleBar(self, self.windowTitle()))
+
+        content = QWidget()
+        shell.addWidget(content, 1)
+        root = QVBoxLayout(content)
         root.setContentsMargins(28, 23, 28, 19)
         root.setSpacing(17)
 
@@ -219,9 +364,11 @@ class MainWindow(QMainWindow):
         self._make_guide()
 
         footer = QHBoxLayout()
+        footer.setSpacing(16)
         footer.addWidget(label(f"v{__version__}   ·   {__author__}", "footer", False))
         footer.addStretch()
-        footer.addWidget(button("GitHub", "link", lambda: QDesktopServices.openUrl(QUrl(GITHUB))))
+        footer.addWidget(action_label("Steam", lambda: QDesktopServices.openUrl(QUrl(STEAM))))
+        footer.addWidget(action_label("GitHub", lambda: QDesktopServices.openUrl(QUrl(GITHUB))))
         root.addLayout(footer)
 
     def _make_welcome(self):
@@ -243,7 +390,7 @@ class MainWindow(QMainWindow):
             existing = output_path()
             if existing.is_file() and existing.stat().st_size > 1_000_000:
                 self.pack = existing
-                left.addWidget(button("Пак уже є · перейти до інструкції", "link", self._open_existing))
+                left.addWidget(action_label("Пак уже є · перейти до інструкції", self._open_existing))
         except OSError:
             pass
         left.addStretch(1)
@@ -288,11 +435,6 @@ class MainWindow(QMainWindow):
         option_row.addWidget(self.option, 1)
         option_row.addWidget(button("Копіювати", "primary", self._copy_option))
         body.addLayout(option_row)
-        path_row = QHBoxLayout()
-        self.path_label = label("", "muted")
-        path_row.addWidget(self.path_label, 1)
-        path_row.addWidget(button("Копіювати шлях", "secondary", self._copy_path))
-        body.addLayout(path_row)
 
         visual = QFrame()
         visual.setObjectName("inner")
@@ -311,7 +453,7 @@ class MainWindow(QMainWindow):
         nav.addWidget(self.prev_step)
         nav.addWidget(self.next_step)
         nav.addStretch()
-        nav.addWidget(button("На початок", "link", self._return_to_welcome))
+        nav.addWidget(action_label("На початок", self._return_to_welcome))
         body.addLayout(nav)
         self.pages.addWidget(page)
         self._set_guide_step(0)
@@ -372,8 +514,6 @@ class MainWindow(QMainWindow):
             return
         self.option.setText(launch_option(self.pack))
         self.option.setToolTip(self.option.text())
-        self.path_label.setText("Пак: " + str(self.pack))
-        self.path_label.setToolTip(str(self.pack))
         self._set_guide_step(0)
         self._set_page(2)
 
@@ -392,7 +532,7 @@ class MainWindow(QMainWindow):
             self.guide_image.setPixmap(pixmap.scaled(820, 180, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         else:
             self.guide_image.setText("Зображення інструкції недоступне")
-        self.prev_step.setEnabled(number > 0)
+        self.prev_step.setVisible(number > 0)
         self.next_step.setText("Готово" if number == 1 else "Далі >")
 
     def _guide_next(self):
@@ -404,11 +544,6 @@ class MainWindow(QMainWindow):
     def _copy_option(self):
         QApplication.clipboard().setText(self.option.text())
         self.guide_title.setText("Рядок скопійовано · встав його в параметри запуску Steam")
-
-    def _copy_path(self):
-        if self.pack:
-            QApplication.clipboard().setText(str(self.pack))
-            self.guide_title.setText("Шлях до пака скопійовано")
 
     def _return_to_welcome(self):
         self.stage.setStyleSheet("")
