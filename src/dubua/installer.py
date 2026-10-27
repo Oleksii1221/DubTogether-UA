@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -25,13 +26,22 @@ def launch_option(pack: Path) -> str:
     return f'--main-pack "{pack}"'
 
 
-def load_assets() -> tuple[dict[str, bytes], dict[str, bytes]]:
+def load_assets() -> tuple[
+    dict[str, bytes], dict[str, bytes], dict[str, str], dict[str, str],
+]:
     manifest = json.loads((ASSETS / "manifest.json").read_text(encoding="utf-8"))
     patches = {name: (ASSETS / item["file"]).read_bytes()
                for name, item in manifest["patches"].items()}
     added = {name: (ASSETS / item["file"]).read_bytes()
              for name, item in manifest["added"].items()}
-    return patches, added
+    originals = {name: item["original_sha256"]
+                 for name, item in manifest["patches"].items()}
+    results = {name: item["result_sha256"]
+               for name, item in manifest["patches"].items()}
+    for name, data in added.items():
+        if hashlib.sha256(data).hexdigest() != manifest["added"][name]["sha256"]:
+            raise PackError("Файли інсталятора пошкоджено. Завантажте його ще раз.")
+    return patches, added, originals, results
 
 
 def install(
@@ -47,12 +57,15 @@ def install(
         raise PackError("Dub Together не знайдено у бібліотеках Steam.")
     if progress:
         progress(8, "Перевіряємо версію гри")
-    verify_game(game)
+    patches, added, originals, results = load_assets()
+    verify_game(game, originals)
     if close_running_game:
         if progress:
             progress(20, "Закриваємо Dub Together")
         close_game_gracefully(game)
-    patches, added = load_assets()
     if progress:
         progress(30, "Готуємо українські файли")
-    return build_pack(game, destination or output_path(), patches, added, progress)
+    return build_pack(
+        game, destination or output_path(), patches, added, progress,
+        expected_originals=originals, expected_results=results,
+    )
