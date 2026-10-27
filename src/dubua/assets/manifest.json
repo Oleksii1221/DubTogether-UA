@@ -2,34 +2,34 @@
   "patches": {
     "autoload/Lang.gdc": {
       "file": "Lang.gdc.bsdiff",
-      "original_sha256": "3166422b4c7d063106087e2a49a6f0e128e9fb22ed96f7a09ab97daeba278ba3",
-      "result_sha256": "aa5ff3370d3643dcdcd247d006682b49d475ba1015c3490a4c49df6039549add"
+      "original_sha256": "01439085b986f7b9154b8ac07285b9082a28e5484d0dce22075ce6656ef7abc9",
+      "result_sha256": "28bd2f1a4e40c7ebcad7540d3e0062cac67485a7225ef4d2e603fcc63a8cc64d"
     },
     "autoload/Settings.gdc": {
       "file": "Settings.gdc.bsdiff",
-      "original_sha256": "8025673872922f6cc0bca1bbfe620df8f3c3cf597f8984b6cfe70f18fd198f13",
-      "result_sha256": "0c449ae487760b342189646e49b2efd24db68c7d5db5758895eeb9c765946a1d"
+      "original_sha256": "4d6af1c6fc4a124fdce55b5a90f937f111ff1f5a526086e8a6dda8418e4991d3",
+      "result_sha256": "53639edbfc219915b314f96ebd0064de58b4e09ea2373034972177a345122641"
     },
     "autoload/UiTheme.gdc": {
       "file": "UiTheme.gdc.bsdiff",
-      "original_sha256": "c4ea099cbdb64903b9844aa65173ee77e0bd9c60033ce57003f6bb304e0dde03",
-      "result_sha256": "4f22940b8549269565e653c268537ddf63e01f31ff5a3ea5f74e1e3a2a5a812e"
+      "original_sha256": "1356e80c1af2bb50140446cbeb537a0e808dd6f6f6649a1d4cff751906b6866e",
+      "result_sha256": "19ab86a9325e69e3a29ac8cfd0be887944c5cfb94ca2d4707e81fdedc81ea6f7"
     },
     "scenes/screens/SettingsScreen.gdc": {
       "file": "SettingsScreen.gdc.bsdiff",
-      "original_sha256": "79389c5a737be6c465785f83f3058d1130edbfdd05418bf2bf3c549fd2b09c44",
-      "result_sha256": "41ba818641acf781f6f35a4d229aadac0edf10d89cfac8de90edafdb0d0ccc13"
+      "original_sha256": "53f536fb4f4322a66f5e1944c8bd51da8ad7e4b5b1968a695df0259d6f4d1a5e",
+      "result_sha256": "4ebbceccea48dcbcc0b2e2b79b9798aab996d4e0afaa5346df2fec85ca4332b0"
     },
     "scenes/screens/RecordScreen.gdc": {
       "file": "RecordScreen.gdc.bsdiff",
-      "original_sha256": "3b987065bb8b281a8c2730c19c94713e09b7354894d2a721b07e8d48bf8c1d2d",
-      "result_sha256": "c34725e2b3d93352a5997c84a4d5077dae55e838b35bdfcb04ab01d6ebd6c189"
+      "original_sha256": "80e69760080fd6c7787ec53c375e38bdd13c0c1c84ca7640955e7c386b1c91bf",
+      "result_sha256": "b5e62b26cc93217e6f6630253c506c43ec1790b550efb4ef8c1e4c8e562b97db"
     }
   },
   "added": {
     "autoload/sprachen/uk.gdc": {
       "file": "uk.gdc",
-      "sha256": "79b81ebef3b844052434184c66fb329475d0ea6fc2f42f9a2d5ba5ac49f26f81"
+      "sha256": "591a01169a21bb0c52c9240e95469c1cca1a0d6e7b8fbcc10935fc61ff179877"
     },
     "autoload/sprachen/uk.gd.remap": {
       "file": "uk.gd.remap",
